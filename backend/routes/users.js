@@ -61,6 +61,7 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+
 // Récupérer la liste de tous les utilisateurs
 router.get('/', async (req, res) => {
   try {

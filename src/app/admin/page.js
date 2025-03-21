@@ -11,7 +11,7 @@ export default function AdminPage() {
     const fetchUsers = async () => {
       try {
         const token = localStorage.getItem('token'); // Récupérer le token
-        const response = await axios.get('http://localhost:5000/users', { // Utiliser la route /users
+        const response = await axios.get('http://localhost:5000/users', {
           headers: {
             Authorization: `Bearer ${token}`, // Ajouter le token dans les headers
           },
@@ -25,6 +25,22 @@ export default function AdminPage() {
 
     fetchUsers();
   }, []);
+
+  const handleDelete = async (userId) => {
+    try {
+      const token = localStorage.getItem('token'); // Récupérer le token
+      await axios.delete(`http://localhost:5000/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Ajouter le token dans les headers
+        },
+      });
+      // Mettre à jour la liste des utilisateurs après suppression
+      setUsers(users.filter(user => user._id !== userId));
+    } catch (err) {
+      setError('Erreur lors de la suppression de l\'utilisateur.');
+      console.error(err);
+    }
+  };
 
   return (
     <div className="container mt-5">
@@ -48,7 +64,12 @@ export default function AdminPage() {
               <td>{user.username}</td>
               <td>{user.role}</td>
               <td>
-                {/* Ajouter ici les boutons d'action comme supprimer */}
+                <button 
+                  className="btn btn-danger" 
+                  onClick={() => handleDelete(user._id)} // Supprimer l'utilisateur au clic
+                >
+                  Supprimer
+                </button>
               </td>
             </tr>
           ))}
