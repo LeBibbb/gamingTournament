@@ -64,12 +64,12 @@ export default function AdminPage() {
               <td>{user.username}</td>
               <td>{user.role}</td>
               <td>
-                <button 
-                  className="btn btn-danger" 
-                  onClick={() => handleDelete(user._id)} // Supprimer l'utilisateur au clic
-                >
-                  Supprimer
-                </button>
+              <button 
+                    className="btn btn-danger" 
+                    onClick={() => handleDelete(user._id)}
+                  >
+                    <i className="bi bi-trash"></i>
+              </button>
               </td>
             </tr>
           ))}

@@ -1,5 +1,6 @@
 // frontend/src/app/layout.js
 import Navbar from '../components/Navbar'; // Importer le composant Navbar
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Assure-toi d'importer Bootstrap globalement
 
 export const metadata = {

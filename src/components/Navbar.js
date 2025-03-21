@@ -56,16 +56,22 @@ export default function Navbar() {
           <ul className="navbar-nav ms-auto">
             {userName ? (
               <>
-                <li className="nav-item">
-                  <span className="nav-link">Bienvenue, {userName}</span>
-                </li>
-                {isAdmin && (
+              {isAdmin && (
                   <li className="nav-item">
-                    <Link className="nav-link" href="/admin">Supprimer des utilisateurs</Link>
+                    <Link className="nav-link" href="/admin">Utilisateurs</Link>
+                  </li>
+                )}
+              {isAdmin && (
+                  <li className="nav-item">
+                    <Link className="nav-link" href="/tournament">Tournois</Link>
                   </li>
                 )}
                 <li className="nav-item">
-                  <button className="btn btn-link nav-link" onClick={handleLogout}>Se déconnecter</button>
+                  <span className="nav-link">Bienvenue, {userName}</span>
+                </li>
+                
+                <li className="nav-item">
+                  <button className="btn btn-link nav-link" onClick={handleLogout}><i class="bi bi-box-arrow-right"></i></button>
                 </li>
               </>
             ) : (
