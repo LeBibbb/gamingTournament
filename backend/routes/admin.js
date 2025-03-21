@@ -28,18 +28,5 @@ const verifyAdmin = (req, res, next) => {
 };
 
 
-// Route pour obtenir tous les utilisateurs
-router.get('/users', async (req, res) => {
-  try {
-    const users = await User.find(); // Récupère tous les utilisateurs de la base de données
-    console.log(users)
-    res.json(users); // Renvoie la liste des utilisateurs au frontend
-  } catch (err) {
-    res.status(500).json({ message: 'Erreur du serveur' });
-  }
-});
-
-module.exports = router;
-
 
 module.exports = router;

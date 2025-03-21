@@ -1,4 +1,3 @@
-// frontend/src/app/admin/page.js
 'use client'
 
 import { useEffect, useState } from 'react';
@@ -12,7 +11,7 @@ export default function AdminPage() {
     const fetchUsers = async () => {
       try {
         const token = localStorage.getItem('token'); // Récupérer le token
-        const response = await axios.get('http://localhost:5000/api/admin/users', {
+        const response = await axios.get('http://localhost:5000/users', { // Utiliser la route /users
           headers: {
             Authorization: `Bearer ${token}`, // Ajouter le token dans les headers
           },

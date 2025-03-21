@@ -1,25 +1,25 @@
 const express = require('express');
-const app = express();
 const cors = require('cors');
+const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-require('dotenv').config();
+const jwt = require('jsonwebtoken');
+const User = require('./models/User'); // Assure-toi que le modèle User est bien défini
+const userRoutes = require("./routes/users");  // Assure-toi que ce chemin est correct
 
-// Importer les routes
-const userRoutes = require('./routes/users');
-
-app.use(cors());
+dotenv.config();
+const app = express();
 app.use(express.json());
+app.use(cors());
 
-// Utiliser les routes
-app.use('/api/users', userRoutes);
+const PORT = process.env.PORT || 5000;
 
-// Connexion à la base de données
+// Montée des routes utilisateurs
+app.use('/users', userRoutes);  // Assurez-vous que toutes les routes commencent par /users
+
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('Connecté à la base de données'))
-  .catch(err => console.log('Erreur de connexion à la base de données', err));
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.log(err));
 
-// Démarrer le serveur
-const port = process.env.PORT || 5000;
-app.listen(port, () => {
-  console.log(`Serveur démarré sur le port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });

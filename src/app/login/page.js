@@ -18,7 +18,7 @@ export default function AuthPage() {
     e.preventDefault();
     setError('');
     try {
-      const url = isLogin ? '/api/users/login' : '/api/users/register';
+      const url = isLogin ? '/users/login' : '/users/register';  // L'URL commence bien par /users
       const { data } = await axios.post(`http://localhost:5000${url}`, formData);
       
       if (isLogin) {
