@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 const User = require('./models/User'); // Assure-toi que le modèle User est bien défini
 const userRoutes = require("./routes/users");  // Assure-toi que ce chemin est correct
 const tournamentRoutes = require("./routes/tournament");
+const teamsRoutes = require("./routes/teams");
+
 
 
 dotenv.config();
@@ -20,6 +22,9 @@ app.use('/users', userRoutes);  // Assurez-vous que toutes les routes commencent
 
 
 app.use("/tournaments", tournamentRoutes);
+
+
+app.use("/teams", teamsRoutes);
 
 
 mongoose.connect(process.env.MONGO_URI)

@@ -1,7 +1,6 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const Tournament = require("../models/Tournament");
-
 const router = express.Router();
 
 // Suppression d'un tournoi

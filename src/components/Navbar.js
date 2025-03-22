@@ -64,6 +64,9 @@ export default function Navbar() {
                   <li className="nav-item">
                     <Link className="nav-link" href="/tournament">Tournois</Link>
                   </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" href="/team">Equipes</Link>
+                  </li>
                 
                 <li className="nav-item">
                   <span className="nav-link">Bienvenue, {userName}</span>
