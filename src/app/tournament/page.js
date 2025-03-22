@@ -4,18 +4,25 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
-export default function CreateTournamentPage() {
+export default function TournamentPage() {
   const [formData, setFormData] = useState({ name: '', game: '', date: '' });
   const [error, setError] = useState('');
   const [tournaments, setTournaments] = useState([]);
-  const [isAdmin, setIsAdmin] = useState(false); // État pour vérifier si l'utilisateur est admin
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [userId, setUserId] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
-    // Vérifier si l'utilisateur est admin dans le localStorage
-    const storedRole = localStorage.getItem('role');  // Récupère le rôle de l'utilisateur
+    // Récupérer les informations utilisateur depuis localStorage
+    const storedRole = localStorage.getItem('role');
+    const storedUserId = localStorage.getItem('userId');
+    
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
+
     if (storedRole === 'admin') {
-      setIsAdmin(true);  // Si l'utilisateur est admin, mettre l'état à true
+      setIsAdmin(true);
     }
 
     // Récupérer tous les tournois
@@ -27,7 +34,7 @@ export default function CreateTournamentPage() {
             Authorization: `Bearer ${token}`,
           },
         });
-        setTournaments(data); // Met à jour l'état des tournois
+        setTournaments(data);
       } catch (err) {
         setError('Erreur lors du chargement des tournois.');
         console.error(err);
@@ -52,14 +59,13 @@ export default function CreateTournamentPage() {
         },
       });
       alert('Tournoi créé avec succès');
-      router.push('/tournament');
+      router.refresh();
     } catch (err) {
       setError(err.response?.data?.message || 'Une erreur est survenue');
     }
   };
 
   const handleDelete = async (tournamentId) => {
-    // Vérifier si l'utilisateur est admin avant de permettre la suppression
     if (!isAdmin) {
       setError("Vous devez être un administrateur pour supprimer un tournoi.");
       return;
@@ -73,7 +79,6 @@ export default function CreateTournamentPage() {
         },
       });
 
-      // Met à jour la liste des tournois après suppression
       setTournaments(tournaments.filter((tournament) => tournament._id !== tournamentId));
     } catch (err) {
       setError('Erreur lors de la suppression du tournoi.');
@@ -81,83 +86,107 @@ export default function CreateTournamentPage() {
     }
   };
 
+  const handleJoinTournament = async (tournamentId) => {
+    if (!userId) {
+      setError("Vous devez être connecté pour vous inscrire à un tournoi.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        `http://localhost:5000/tournaments/${tournamentId}/join`,
+        { userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert('Inscription réussie !');
+      router.refresh();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Une erreur est survenue.');
+    }
+  };
+
+  const handleUnsubscribe = async (tournamentId) => {
+    if (!userId) {
+      setError("Vous devez être connecté pour vous désinscrire d'un tournoi.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        `http://localhost:5000/tournaments/${tournamentId}/unsubscribe`,
+        { userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert('Désinscription réussie !');
+      router.refresh();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Une erreur est survenue.');
+    }
+  };
+
   return (
     <div className="container mt-5">
-      <div className="card p-4 shadow-sm">
-        <h2 className="text-center">Créer un Tournoi</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label">Nom du Tournoi</label>
-            <input
-              type="text"
-              name="name"
-              className="form-control"
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Jeu</label>
-            <input
-              type="text"
-              name="game"
-              className="form-control"
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Date</label>
-            <input
-              type="date"
-              name="date"
-              className="form-control"
-              onChange={handleChange}
-              required
-            />
-          </div>
-          {error && <div className="alert alert-danger">{error}</div>}
-          <button type="submit" className="btn btn-primary w-100">
-            Créer le Tournoi
-          </button>
-        </form>
-      </div>
-
-      {/* Tableau des tournois */}
-      <div className="container mt-5">
-        <h1>Liste des Tournois</h1>
-        {error && <div className="alert alert-danger">{error}</div>}
-        <table className="table table-bordered">
-          <thead>
-            <tr><th>ID</th>
-              <th>Nom</th>
-              <th>Jeu</th>
-              <th>Date</th>
-              <th>Actions</th>
-              </tr>
-          </thead>
-          <tbody>
-            {tournaments.map((tournament) => (
-              <tr key={tournament._id}>
-                <td>{tournament._id}</td>
-                <td>{tournament.name}</td>
-                <td>{tournament.game}</td>
-                <td>{tournament.date}</td>
-                {isAdmin && (
-                  <td>
+      <h1>Liste des Tournois</h1>
+      {error && <div className="alert alert-danger">{error}</div>}
+      <table className="table table-bordered">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Jeu</th>
+            <th>Date</th>
+            <th>Participants</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tournaments.map((tournament) => (
+            <tr key={tournament._id}>
+              <td>{tournament.name}</td>
+              <td>{tournament.game}</td>
+              <td>{new Date(tournament.date).toLocaleDateString()}</td>
+              <td>{tournament.participants.length}</td>
+              <td>
+                {!isAdmin && (
+                  <>
+                    <button
+                      className="btn btn-success me-2"
+                      onClick={() => handleJoinTournament(tournament._id)}
+                    >
+                      S'inscrire
+                    </button>
                     <button
                       className="btn btn-danger"
-                      onClick={() => handleDelete(tournament._id)}
+                      onClick={() => handleUnsubscribe(tournament._id)}
                     >
-                      <i className="bi bi-trash"></i> Supprimer
+                      Se désinscrire
                     </button>
-                  </td>
+                  </>
                 )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                {isAdmin && (
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleDelete(tournament._id)}
+                  >
+                    <i className="bi bi-trash"></i> Supprimer
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

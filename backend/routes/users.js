@@ -12,21 +12,25 @@ router.post('/login', async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: 'Utilisateur non trouvé' });
 
+    // Vérification du mot de passe (en production, utilise bcrypt pour comparer le mot de passe)
     if (password !== user.password) return res.status(400).json({ message: 'Mot de passe incorrect' });
 
-    // Générer un token
+    // Générer un token JWT
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
+    // Envoyer la réponse avec le token, userId et role
     res.json({
       token,
+      userId: user._id,    // Ajouter l'ID de l'utilisateur
       username: user.username,
-      role: user.role,
+      role: user.role,      // Ajouter le rôle de l'utilisateur
     });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Erreur du serveur' });
   }
 });
+
 
 // Inscription
 router.post("/register", async (req, res) => {

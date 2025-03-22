@@ -53,4 +53,62 @@ router.post("/", async (req, res) => {
 });
 
 
+
+// Inscription d'un utilisateur à un tournoi
+// backend/routes/tournaments.js
+router.post('/:tournamentId/join', async (req, res) => {
+  const { tournamentId } = req.params;
+  const { userId } = req.body;  // L'ID de l'utilisateur
+
+  try {
+    const tournament = await Tournament.findById(tournamentId);
+    if (!tournament) {
+      return res.status(404).json({ message: 'Tournoi non trouvé' });
+    }
+
+    // Vérifier si l'utilisateur est déjà inscrit
+    if (tournament.participants.includes(userId)) {
+      return res.status(400).json({ message: 'Vous êtes déjà inscrit à ce tournoi' });
+    }
+
+    // Ajouter l'utilisateur à la liste des participants
+    tournament.participants.push(userId);
+    await tournament.save();
+
+    res.status(200).json({ message: 'Inscription réussie' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur du serveur' });
+  }
+});
+
+
+// backend/routes/tournaments.js
+router.post('/:tournamentId/unsubscribe', async (req, res) => {
+  const { tournamentId } = req.params;
+  const { userId } = req.body;  // L'ID de l'utilisateur
+
+  try {
+    const tournament = await Tournament.findById(tournamentId);
+    if (!tournament) {
+      return res.status(404).json({ message: 'Tournoi non trouvé' });
+    }
+
+    // Vérifier si l'utilisateur est inscrit
+    const userIndex = tournament.participants.indexOf(userId);
+    if (userIndex === -1) {
+      return res.status(400).json({ message: 'Vous n\'êtes pas inscrit à ce tournoi' });
+    }
+
+    // Retirer l'utilisateur de la liste des participants
+    tournament.participants.splice(userIndex, 1);
+    await tournament.save();
+
+    res.status(200).json({ message: 'Désinscription réussie' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur du serveur' });
+  }
+});
+
 module.exports = router;

@@ -61,11 +61,10 @@ export default function Navbar() {
                     <Link className="nav-link" href="/admin">Utilisateurs</Link>
                   </li>
                 )}
-              {isAdmin && (
                   <li className="nav-item">
                     <Link className="nav-link" href="/tournament">Tournois</Link>
                   </li>
-                )}
+                
                 <li className="nav-item">
                   <span className="nav-link">Bienvenue, {userName}</span>
                 </li>

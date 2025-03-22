@@ -22,13 +22,15 @@ export default function AuthPage() {
       const { data } = await axios.post(`http://localhost:5000${url}`, formData);
       
       if (isLogin) {
+        // En cas de connexion réussie, on récupère le token, userId et role et les stocke
         localStorage.setItem('token', data.token);
-        localStorage.setItem('username', data.username);
-        localStorage.setItem('role', data.role);
-        router.push('/');
+        localStorage.setItem('userId', data.userId);  // Stocke le userId
+        localStorage.setItem('username', data.username);  // Stocke le nom d'utilisateur
+        localStorage.setItem('role', data.role);  // Stocke le rôle
+        router.push('/');  // Redirige vers la page d'accueil après la connexion
       } else {
         alert('Inscription réussie, vous pouvez maintenant vous connecter.');
-        setIsLogin(true);
+        setIsLogin(true);  // Passe à l'écran de connexion
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Une erreur est survenue');
