@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const User = require('./models/User'); // Assure-toi que le modèle User est bien défini
 const userRoutes = require("./routes/users");  // Assure-toi que ce chemin est correct
-const tournamentRoutes = require("./routes/tournament");
+const tournamentRoutes = require("./routes/tournaments");
 const teamsRoutes = require("./routes/teams");
 
 
