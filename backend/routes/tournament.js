@@ -27,4 +27,30 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Création d'un tournoi
+router.post("/", async (req, res) => {
+  const { name, game, date } = req.body;
+
+  if (!name || !game || !date) {
+    return res.status(400).json({ message: "Nom, jeu et date sont requis" });
+  }
+
+  try {
+    const newTournament = new Tournament({
+      name,
+      game,
+      date,
+      participants: [], // Initialisation vide pour la liste des participants
+      status: 'open', // Statut par défaut
+    });
+
+    await newTournament.save();
+    res.status(201).json(newTournament); // Retourne le tournoi créé
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors de la création du tournoi" });
+    console.error(err);
+  }
+});
+
+
 module.exports = router;
