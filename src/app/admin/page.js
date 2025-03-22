@@ -49,7 +49,6 @@ export default function AdminPage() {
       <table className="table table-bordered">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Email</th>
             <th>Nom d'utilisateur</th>
             <th>Rôle</th>
@@ -59,7 +58,6 @@ export default function AdminPage() {
         <tbody>
           {users.map((user) => (
             <tr key={user._id}>
-              <td>{user._id}</td>
               <td>{user.email}</td>
               <td>{user.username}</td>
               <td>{user.role}</td>

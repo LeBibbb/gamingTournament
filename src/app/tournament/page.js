@@ -53,7 +53,7 @@ export default function TournamentPage() {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const { data } = await axios.post('http://localhost:5000/tournaments', formData, {
+      await axios.post('http://localhost:5000/tournaments', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -86,60 +86,54 @@ export default function TournamentPage() {
     }
   };
 
-  const handleJoinTournament = async (tournamentId) => {
-    if (!userId) {
-      setError("Vous devez être connecté pour vous inscrire à un tournoi.");
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem('token');
-      await axios.post(
-        `http://localhost:5000/tournaments/${tournamentId}/join`,
-        { userId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      alert('Inscription réussie !');
-      router.refresh();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Une erreur est survenue.');
-    }
-  };
-
-  const handleUnsubscribe = async (tournamentId) => {
-    if (!userId) {
-      setError("Vous devez être connecté pour vous désinscrire d'un tournoi.");
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem('token');
-      await axios.post(
-        `http://localhost:5000/tournaments/${tournamentId}/unsubscribe`,
-        { userId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      alert('Désinscription réussie !');
-      router.refresh();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Une erreur est survenue.');
-    }
-  };
-
   return (
     <div className="container mt-5">
       <h1>Liste des Tournois</h1>
       {error && <div className="alert alert-danger">{error}</div>}
+
+      {/* Formulaire visible uniquement pour les admins */}
+      {isAdmin && (
+        <div className="mb-4">
+          <h2>Créer un tournoi</h2>
+          <form onSubmit={handleSubmit} className="mb-3">
+            <div className="mb-3">
+              <label className="form-label">Nom du tournoi</label>
+              <input
+                type="text"
+                name="name"
+                className="form-control"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Jeu</label>
+              <input
+                type="text"
+                name="game"
+                className="form-control"
+                value={formData.game}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Date</label>
+              <input
+                type="date"
+                name="date"
+                className="form-control"
+                value={formData.date}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <button type="submit" className="btn btn-primary">Créer</button>
+          </form>
+        </div>
+      )}
+
       <table className="table table-bordered">
         <thead>
           <tr>
@@ -158,29 +152,15 @@ export default function TournamentPage() {
               <td>{new Date(tournament.date).toLocaleDateString()}</td>
               <td>{tournament.participants.length}</td>
               <td>
-                {!isAdmin && (
-                  <>
-                    <button
-                      className="btn btn-success me-2"
-                      onClick={() => handleJoinTournament(tournament._id)}
-                    >
-                      S'inscrire
-                    </button>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleUnsubscribe(tournament._id)}
-                    >
-                      Se désinscrire
-                    </button>
-                  </>
-                )}
-                {isAdmin && (
+                {isAdmin ? (
                   <button
                     className="btn btn-danger"
                     onClick={() => handleDelete(tournament._id)}
                   >
                     <i className="bi bi-trash"></i> Supprimer
                   </button>
+                ) : (
+                  <button className="btn btn-success">S'inscrire</button>
                 )}
               </td>
             </tr>
