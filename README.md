@@ -13,6 +13,8 @@ npm install
 npm install -g nodemon
 nodemon server.js
 
++ .env to connect API
+
 
 ```
 
