@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -8,10 +8,17 @@ export default function CreateTournamentPage() {
   const [formData, setFormData] = useState({ name: '', game: '', date: '' });
   const [error, setError] = useState('');
   const [tournaments, setTournaments] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false); // État pour vérifier si l'utilisateur est admin
   const router = useRouter();
 
-  // Récupérer tous les tournois
   useEffect(() => {
+    // Vérifier si l'utilisateur est admin dans le localStorage
+    const storedRole = localStorage.getItem('role');  // Récupère le rôle de l'utilisateur
+    if (storedRole === 'admin') {
+      setIsAdmin(true);  // Si l'utilisateur est admin, mettre l'état à true
+    }
+
+    // Récupérer tous les tournois
     const fetchTournaments = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -52,29 +59,27 @@ export default function CreateTournamentPage() {
   };
 
   const handleDelete = async (tournamentId) => {
+    // Vérifier si l'utilisateur est admin avant de permettre la suppression
+    if (!isAdmin) {
+      setError("Vous devez être un administrateur pour supprimer un tournoi.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        setError('Token manquant. Veuillez vous reconnecter.');
-        return;
-      }
-  
-      const response = await axios.delete(`http://localhost:5000/tournaments/${tournamentId}`, {
+      await axios.delete(`http://localhost:5000/tournaments/${tournamentId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-  
-      // Si la suppression est réussie, on met à jour la liste des tournois
+
+      // Met à jour la liste des tournois après suppression
       setTournaments(tournaments.filter((tournament) => tournament._id !== tournamentId));
-      alert('Tournoi supprimé avec succès');
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Une erreur est survenue lors de la suppression.';
-      setError(errorMessage);
+      setError('Erreur lors de la suppression du tournoi.');
       console.error(err);
     }
   };
-  
 
   return (
     <div className="container mt-5">
@@ -124,13 +129,12 @@ export default function CreateTournamentPage() {
         {error && <div className="alert alert-danger">{error}</div>}
         <table className="table table-bordered">
           <thead>
-            <tr>
-              <th>ID</th>
+            <tr><th>ID</th>
               <th>Nom</th>
               <th>Jeu</th>
               <th>Date</th>
               <th>Actions</th>
-            </tr>
+              </tr>
           </thead>
           <tbody>
             {tournaments.map((tournament) => (
@@ -139,14 +143,16 @@ export default function CreateTournamentPage() {
                 <td>{tournament.name}</td>
                 <td>{tournament.game}</td>
                 <td>{tournament.date}</td>
-                <td>
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => handleDelete(tournament._id)}
-                  >
-                    <i className="bi bi-trash"></i> Supprimer
-                  </button>
-                </td>
+                {isAdmin && (
+                  <td>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => handleDelete(tournament._id)}
+                    >
+                      <i className="bi bi-trash"></i> Supprimer
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

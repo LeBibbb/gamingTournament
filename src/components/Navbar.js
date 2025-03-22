@@ -71,7 +71,7 @@ export default function Navbar() {
                 </li>
                 
                 <li className="nav-item">
-                  <button className="btn btn-link nav-link" onClick={handleLogout}><i class="bi bi-box-arrow-right"></i></button>
+                  <button className="btn btn-link nav-link" onClick={handleLogout}><i className="bi bi-box-arrow-right"></i></button>
                 </li>
               </>
             ) : (
