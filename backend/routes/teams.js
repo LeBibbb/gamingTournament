@@ -64,6 +64,28 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.post('/:teamId/join2', async (req, res) => {
+  const { teamId } = req.params;
+  const { userId } = req.body;
+
+  try {
+    const team = await Team.findById(teamId);
+    if (!team) return res.status(404).json({ message: "Équipe non trouvée." });
+
+    if (team.participants.includes(userId)) {
+      return res.status(400).json({ message: "Vous êtes déjà dans cette équipe." });
+    }
+
+    team.participants.push(userId);
+    await team.save();
+
+    res.json(team);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur." });
+  }
+});
+
+
   router.post('/:teamID/join', async (req, res) => {
     const { teamID } = req.params;
     const { userId } = req.body;  // L'ID de l'utilisateur

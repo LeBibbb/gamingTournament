@@ -82,6 +82,24 @@ const handleDeleteTeam = async (teamId) => {
     setError("Erreur lors de la suppression de l'équipe.");
   }
 };
+  const handleJoinTeam = async (teamId) => {
+    if (userTeam) {
+      setError("Vous faites déjà partie d'une équipe.");
+      return;
+    }
+
+    try {
+      const { data } = await axios.post(`http://localhost:5000/teams/${teamId}/join2`, { userId });
+
+      setTeams(teams.map(team => 
+        team._id === teamId ? { ...team, participants: [...team.participants, userId] } : team
+      ));
+      setUserTeam(data);
+    } catch (err) {
+      setError("Erreur lors de l'ajout à l'équipe.");
+    }
+  };
+
 
   return (
     <div className="container mt-5">
@@ -126,6 +144,12 @@ const handleDeleteTeam = async (teamId) => {
                       Supprimer
                     </button>
                   )}
+                  <button
+                      className="btn btn-danger"
+                      onClick={() => handleJoinTeam(team._id)}
+                    >
+                      Rejoindre
+                    </button>
                 </td>
             </tr>
           ))}
